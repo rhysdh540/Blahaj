@@ -1,58 +1,71 @@
 package hibi.blahaj;
 
-import hibi.blahaj.block.*;
-import net.fabricmc.api.*;
-import net.fabricmc.fabric.api.loot.v2.*;
-import net.fabricmc.fabric.api.object.builder.v1.trade.*;
-import net.minecraft.item.*;
-import net.minecraft.loot.*;
-import net.minecraft.loot.entry.*;
-import net.minecraft.village.*;
+import hibi.blahaj.block.BlahajBlocks;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 
-public class Blahaj implements ModInitializer {
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+
+@Mod(Blahaj.MOD_ID)
+public class Blahaj {
 
 	public static final String MOD_ID = "blahaj";
 
-	public void onInitialize() {
-		BlahajDataComponentTypes.register();
-		BlahajBlocks.register();
-		registerLootTables();
-		registerTrades();
+	public Blahaj(IEventBus modEventBus, ModContainer modContainer) {
+		BlahajDataComponentTypes.register(modEventBus);
+		BlahajBlocks.register(modEventBus);
+
+		NeoForge.EVENT_BUS.addListener(this::onTradesLoad);
+		NeoForge.EVENT_BUS.addListener(this::onLootTableLoad);
 	}
 
-	private static void registerLootTables() {
-		LootTableEvents.MODIFY.register((key, tableBuilder, source) -> {
-			if (key.equals(LootTables.STRONGHOLD_CROSSING_CHEST) || key.equals(LootTables.STRONGHOLD_CORRIDOR_CHEST)) {
-				LootPool.Builder pb = LootPool.builder()
-					.with(ItemEntry.builder(BlahajBlocks.GRAY_SHARK_ITEM).weight(5))
-					.with(ItemEntry.builder(Items.AIR).weight(100));
-				tableBuilder.pool(pb);
-			} else if (key.equals(LootTables.VILLAGE_PLAINS_CHEST)) {
-				LootPool.Builder pb = LootPool.builder()
-					.with(ItemEntry.builder(BlahajBlocks.GRAY_SHARK_ITEM))
-					.with(ItemEntry.builder(Items.AIR).weight(43));
-				tableBuilder.pool(pb);
-			} else if (key.equals(LootTables.VILLAGE_TAIGA_HOUSE_CHEST) || key.equals(LootTables.VILLAGE_SNOWY_HOUSE_CHEST)) {
-				LootPool.Builder pb = LootPool.builder()
-					.with(ItemEntry.builder(BlahajBlocks.GRAY_SHARK_ITEM).weight(5))
-					.with(ItemEntry.builder(Items.AIR).weight(54));
-				tableBuilder.pool(pb);
-			} else if (key.equals(LootTables.HERO_OF_THE_VILLAGE_FLETCHER_GIFT_GAMEPLAY)
-				|| key.equals(LootTables.HERO_OF_THE_VILLAGE_BUTCHER_GIFT_GAMEPLAY)
-				|| key.equals(LootTables.HERO_OF_THE_VILLAGE_LEATHERWORKER_GIFT_GAMEPLAY)) {
+	private void onLootTableLoad(LootTableLoadEvent event) {
+		ResourceLocation key = event.getName();
+		LootTable table = event.getTable();
+		if(key.equals(BuiltInLootTables.STRONGHOLD_CROSSING) || key.equals(BuiltInLootTables.STRONGHOLD_CORRIDOR)) {
+			LootPool.Builder pb = LootPool.lootPool()
+					.add(LootItem.lootTableItem(BlahajBlocks.GRAY_SHARK_ITEM.get()).setWeight(5))
+					.add(LootItem.lootTableItem(Items.AIR).setWeight(100));
+			table.addPool(pb.build());
+		} else if(key.equals(BuiltInLootTables.VILLAGE_PLAINS_HOUSE)) {
+			LootPool.Builder pb = LootPool.lootPool()
+					.add(LootItem.lootTableItem(BlahajBlocks.GRAY_SHARK_ITEM.get()))
+					.add(LootItem.lootTableItem(Items.AIR).setWeight(43));
+			table.addPool(pb.build());
+		} else if(key.equals(BuiltInLootTables.VILLAGE_TAIGA_HOUSE) || key.equals(BuiltInLootTables.VILLAGE_SNOWY_HOUSE)) {
+			LootPool.Builder pb = LootPool.lootPool()
+					.add(LootItem.lootTableItem(BlahajBlocks.GRAY_SHARK_ITEM.get()).setWeight(5))
+					.add(LootItem.lootTableItem(Items.AIR).setWeight(54));
+			table.addPool(pb.build());
+		} else if(key.equals(BuiltInLootTables.FLETCHER_GIFT)
+				|| key.equals(BuiltInLootTables.BUTCHER_GIFT)
+				|| key.equals(BuiltInLootTables.LEATHERWORKER_GIFT)) {
 
-				LootPool.Builder pb = LootPool.builder()
-					.with(ItemEntry.builder(BlahajBlocks.BROWN_BEAR_ITEM).weight(5))
-					.with(ItemEntry.builder(Items.AIR).weight(25));
-				tableBuilder.pool(pb);
-			}
-		});
+			LootPool.Builder pb = LootPool.lootPool()
+					.add(LootItem.lootTableItem(BlahajBlocks.BROWN_BEAR_ITEM.get()).setWeight(5))
+					.add(LootItem.lootTableItem(Items.AIR).setWeight(25));
+			table.addPool(pb.build());
+		}
 	}
 
-	private static void registerTrades() {
-		TradeOfferHelper.registerVillagerOffers(VillagerProfession.SHEPHERD, 5, factories -> {
-			factories.add((entity, random) -> new TradeOffer(new TradedItem(Items.EMERALD, 15), new ItemStack(BlahajBlocks.GRAY_SHARK_ITEM), 2, 30, 0.1f));
-		});
+	private void onTradesLoad(VillagerTradesEvent event) {
+		if(event.getType() == VillagerProfession.SHEPHERD) {
+			event.getTrades().computeIfAbsent(5, k -> NonNullList.create()).add((entity, random) -> new MerchantOffer(new ItemCost(Items.EMERALD, 15), new ItemStack(BlahajBlocks.GRAY_SHARK_ITEM), 2, 30, 0.1f));
+		}
 	}
 
 }

@@ -1,85 +1,74 @@
 package hibi.blahaj.block;
 
-import net.fabricmc.fabric.api.blockrenderlayer.v1.*;
-import net.fabricmc.fabric.api.itemgroup.v1.*;
-import net.minecraft.block.*;
-import net.minecraft.client.render.*;
-import net.minecraft.item.*;
-import net.minecraft.registry.*;
-import net.minecraft.util.*;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
+import net.minecraft.Util;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import java.util.*;
 
 import static hibi.blahaj.Blahaj.*;
 
 public class BlahajBlocks {
 
-	public static final Identifier GRAY_SHARK_ID = Identifier.of(MOD_ID, "gray_shark");
-	public static final Identifier BLAHAJ_ID = Identifier.of(MOD_ID, "blue_shark");
-	public static final Identifier BLAVINGAD_ID = Identifier.of(MOD_ID, "blue_whale");
-	public static final Identifier BREAD_ID = Identifier.of(MOD_ID, "bread");
-	public static final Identifier BROWN_BEAR_ID = Identifier.of(MOD_ID, "brown_bear");
+	private static final DeferredRegister<Block> BLOCKS = DeferredRegister.createBlocks(MOD_ID);
+	private static final DeferredRegister<Item> ITEMS = DeferredRegister.createItems(MOD_ID);
 
-	public static Block GRAY_SHARK_BLOCK;
-	public static Item GRAY_SHARK_ITEM;
-	public static Block BLAHAJ_BLOCK;
-	public static Item BLAHAJ_ITEM;
-	public static Block BLAVINGAD_BLOCK;
-	public static Item BLAVINGAD_ITEM;
-	public static Block BREAD_BLOCK;
-	public static Item BREAD_ITEM;
-	public static Block BROWN_BEAR_BLOCK;
-	public static Item BROWN_BEAR_ITEM;
+	public static DeferredHolder<Block, CuddlyBlock> GRAY_SHARK_BLOCK = BLOCKS.register("gray_shark", () -> Util.make(new CuddlyBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.LIGHT_GRAY_WOOL).noOcclusion()), block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout())));
+	public static DeferredHolder<Item, CuddlyItem> GRAY_SHARK_ITEM = ITEMS.register("gray_shark", () -> new CuddlyItem(GRAY_SHARK_BLOCK.get(), new Item.Properties().stacksTo(1).attributes(CuddlyItem.createAttributeModifiers()), "block.blahaj.gray_shark.tooltip"));
+	public static DeferredHolder<Block, CuddlyBlock> BLAHAJ_BLOCK = BLOCKS.register("blue_shark", () -> Util.make(new CuddlyBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.CYAN_WOOL)), block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout())));
+	public static DeferredHolder<Item, CuddlyItem> BLAHAJ_ITEM = ITEMS.register("blue_shark", () -> new CuddlyItem(BLAHAJ_BLOCK.get(), new Item.Properties().stacksTo(1).attributes(CuddlyItem.createAttributeModifiers()), "block.blahaj.blue_shark.tooltip"));
+	public static DeferredHolder<Block, CuddlyBlock> BLAVINGAD_BLOCK = BLOCKS.register("blue_whale", () -> Util.make(new CuddlyBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BLUE_WOOL)), block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout())));
+	public static DeferredHolder<Item, CuddlyItem> BLAVINGAD_ITEM = ITEMS.register("blue_whale", () -> new CuddlyItem(BLAVINGAD_BLOCK.get(), new Item.Properties().stacksTo(1).attributes(CuddlyItem.createAttributeModifiers()), "block.blahaj.blue_whale.tooltip"));
+	public static DeferredHolder<Block, CuddlyBlock> BREAD_BLOCK = BLOCKS.register("bread", () -> Util.make(new CuddlyBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ORANGE_WOOL)), block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout())));
+	public static DeferredHolder<Item, CuddlyItem> BREAD_ITEM = ITEMS.register("bread", () -> new CuddlyItem(BREAD_BLOCK.get(), new Item.Properties().stacksTo(1).attributes(CuddlyItem.createAttributeModifiers()), null));
+	public static DeferredHolder<Block, CuddlyBlock> BROWN_BEAR_BLOCK = BLOCKS.register("brown_bear", () -> Util.make(new CuddlyBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BROWN_WOOL)), block -> ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout())));
+	public static DeferredHolder<Item, CuddlyItem> BROWN_BEAR_ITEM = ITEMS.register("brown_bear", () -> new CuddlyItem(BROWN_BEAR_BLOCK.get(), new Item.Properties().stacksTo(1).attributes(CuddlyItem.createAttributeModifiers()), "block.blahaj.brown_bear.tooltip"));
 
 	public static final List<String> PRIDE_NAMES = List.of(
 		"ace", "agender", "aro", "aroace", "bi", "demiboy", "demigirl",
 		"demi_r", "demi_s", "enby", "gay", "genderfluid", "genderqueer", "greyrose",
 		"grey_r", "grey_s", "intersex", "lesbian", "pan", "poly", "pride", "trans");
 
-	public static List<Block> PRIDE_BLOCKS = new ArrayList<>();
-	public static List<Item> PRIDE_ITEMS = new ArrayList<>();
+	public static List<DeferredHolder<Block, CuddlyBlock>> PRIDE_BLOCKS = new ArrayList<>();
+	public static List<DeferredHolder<Item, CuddlyItem>> PRIDE_ITEMS = new ArrayList<>();
 
-	public static void register() {
-		GRAY_SHARK_BLOCK = Registry.register(Registries.BLOCK, GRAY_SHARK_ID, new CuddlyBlock(AbstractBlock.Settings.copy(Blocks.LIGHT_GRAY_WOOL)));
-		BLAHAJ_BLOCK = Registry.register(Registries.BLOCK, BLAHAJ_ID, new CuddlyBlock(AbstractBlock.Settings.copy(Blocks.CYAN_WOOL)));
-		BLAVINGAD_BLOCK = Registry.register(Registries.BLOCK, BLAVINGAD_ID, new CuddlyBlock(AbstractBlock.Settings.copy(Blocks.BLUE_WOOL)));
-		BREAD_BLOCK = Registry.register(Registries.BLOCK, BREAD_ID, new CuddlyBlock(AbstractBlock.Settings.copy(Blocks.ORANGE_WOOL)));
-		BROWN_BEAR_BLOCK = Registry.register(Registries.BLOCK, BROWN_BEAR_ID, new CuddlyBlock(AbstractBlock.Settings.copy(Blocks.BROWN_WOOL)));
-
-		GRAY_SHARK_ITEM = Registry.register(Registries.ITEM, GRAY_SHARK_ID, new CuddlyItem(GRAY_SHARK_BLOCK, new Item.Settings().maxCount(1).attributeModifiers(CuddlyItem.createAttributeModifiers()), "block.blahaj.gray_shark.tooltip"));
-		BLAHAJ_ITEM = Registry.register(Registries.ITEM, BLAHAJ_ID, new CuddlyItem(BLAHAJ_BLOCK, new Item.Settings().maxCount(1).attributeModifiers(CuddlyItem.createAttributeModifiers()), "block.blahaj.blue_shark.tooltip"));
-		BLAVINGAD_ITEM = Registry.register(Registries.ITEM, BLAVINGAD_ID, new CuddlyItem(BLAVINGAD_BLOCK, new Item.Settings().maxCount(1).attributeModifiers(CuddlyItem.createAttributeModifiers()), "block.blahaj.blue_whale.tooltip"));
-		BREAD_ITEM = Registry.register(Registries.ITEM, BREAD_ID, new CuddlyItem(BREAD_BLOCK, new Item.Settings().maxCount(1).attributeModifiers(CuddlyItem.createAttributeModifiers()), null));
-		BROWN_BEAR_ITEM = Registry.register(Registries.ITEM, BROWN_BEAR_ID, new CuddlyItem(BROWN_BEAR_BLOCK, new Item.Settings().maxCount(1).attributeModifiers(CuddlyItem.createAttributeModifiers()), "block.blahaj.brown_bear.tooltip"));
-
+	static {
 		for (String name : PRIDE_NAMES) {
-			Identifier id = Identifier.of(MOD_ID, name + "_shark");
-			Block block = Registry.register(Registries.BLOCK, id, new CuddlyBlock(AbstractBlock.Settings.copy(Blocks.WHITE_WOOL)));
-			Item item = Registry.register(Registries.ITEM, id, new CuddlyItem(block, new Item.Settings().maxCount(1).attributeModifiers(CuddlyItem.createAttributeModifiers()), "block.blahaj.blue_shark.tooltip"));
+			DeferredHolder<Block, CuddlyBlock> block = BLOCKS.register(name + "_shark", () -> Util.make(new CuddlyBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.WHITE_WOOL)), b -> ItemBlockRenderTypes.setRenderLayer(b, RenderType.cutout())));
+			DeferredHolder<Item, CuddlyItem> item = ITEMS.register(name + "_shark", () -> new CuddlyItem(block.get(), new Item.Properties().stacksTo(1).attributes(CuddlyItem.createAttributeModifiers()), "block.blahaj.blue_shark.tooltip"));
 
 			PRIDE_BLOCKS.add(block);
 			PRIDE_ITEMS.add(item);
-
 		}
-
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> {
-			entries.add(new ItemStack(GRAY_SHARK_ITEM));
-			entries.add(new ItemStack(BLAHAJ_ITEM));
-			entries.add(new ItemStack(BLAVINGAD_ITEM));
-			entries.add(new ItemStack(BREAD_ITEM));
-			entries.add(new ItemStack(BROWN_BEAR_ITEM));
-
-			for (Item item : PRIDE_ITEMS) {
-				entries.add(new ItemStack(item));
-			}
-		});
 	}
 
-	public static void registerClient() {
-		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), GRAY_SHARK_BLOCK, BLAHAJ_BLOCK, BLAVINGAD_BLOCK, BREAD_BLOCK, BROWN_BEAR_BLOCK);
-		for (Block block : PRIDE_BLOCKS) {
-			BlockRenderLayerMap.INSTANCE.putBlock(block, RenderLayer.getCutout());
-		}
+	public static void register(IEventBus eventBus) {
+		eventBus.addListener(BuildCreativeModeTabContentsEvent.class, event -> {
+			if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+				event.accept(new ItemStack(GRAY_SHARK_ITEM));
+				event.accept(new ItemStack(BLAHAJ_ITEM));
+				event.accept(new ItemStack(BLAVINGAD_ITEM));
+				event.accept(new ItemStack(BREAD_ITEM));
+				event.accept(new ItemStack(BROWN_BEAR_ITEM));
+
+				for (DeferredHolder<Item, CuddlyItem> item : PRIDE_ITEMS) {
+					event.accept(new ItemStack(item));
+				}
+			}
+		});
+
+		BLOCKS.register(eventBus);
+		ITEMS.register(eventBus);
 	}
 
 }

@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+issueTrackerURL = "https://github.com/rhysdh540/Blahaj/issues"
+license = "Unlicense"
+
+[[mods]]
+modId = "blahaj"
+version = "${version}"
+displayName = "Blåhaj"
+authors = "hibi, infoplayerstart, DaFuqs, rdh"
+description = "Soft toy, shark mod, 16px."
+logoFile = "assets/blahaj/icon.png"
+
+[[dependencies.blahaj]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[${neoforge_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.blahaj]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${minecraft_version}]"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config="blahaj.mixins.json"

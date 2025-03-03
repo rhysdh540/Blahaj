@@ -1,22 +1,26 @@
 package hibi.blahaj;
 
-import net.minecraft.component.*;
-import net.minecraft.registry.*;
-import net.minecraft.text.*;
-import net.minecraft.util.*;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.function.*;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+
 
 public class BlahajDataComponentTypes {
 
-	public static final ComponentType<Text> OWNER = register("owner", (builder) -> builder.codec(TextCodecs.STRINGIFIED_CODEC).packetCodec(TextCodecs.REGISTRY_PACKET_CODEC).cache());
+	private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Blahaj.MOD_ID);
+	public static final DeferredHolder<DataComponentType<?>, DataComponentType<Component>> OWNER =
+		DATA_COMPONENT_TYPES.register("owner", () -> DataComponentType.<Component>builder()
+			.persistent(ComponentSerialization.FLAT_CODEC)
+			.networkSynchronized(ComponentSerialization.STREAM_CODEC)
+			.cacheEncoding().build());
 
-	private static <T> ComponentType<T> register(String id, UnaryOperator<ComponentType.Builder<T>> builderOperator) {
-		return Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of(Blahaj.MOD_ID, id), builderOperator.apply(ComponentType.builder()).build());
-	}
-
-	public static void register() {
-
+	public static void register(IEventBus modEventBus) {
+		DATA_COMPONENT_TYPES.register(modEventBus);
 	}
 
 }
