@@ -73,4 +73,7 @@ public class Blahaj {
 		}
 	}
 
+	public static final ResourceLocation id(String path) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+	}
 }

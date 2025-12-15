@@ -3,6 +3,7 @@ package hibi.blahaj.block;
 import com.mojang.serialization.*;
 
 import hibi.blahaj.sound.BlahajSoundEvents;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -43,18 +44,17 @@ public class CuddlyBlock extends HorizontalDirectionalBlock {
 	@Override
 	@SuppressWarnings("null")
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
-			BlockHitResult hitResult) {
-				level.playSound(null, pos, BlahajSoundEvents.getRandomSqueak(level.getRandom()), SoundSource.BLOCKS, 0.5f, 1);
+											   BlockHitResult hitResult) {
+		level.playSound(null, pos, BlahajSoundEvents.getRandomSqueak(level.getRandom()), SoundSource.BLOCKS, 0.5f, 1);
 		return InteractionResult.SUCCESS;
 	}
 
 	@Override
 	@SuppressWarnings("null")
 	protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
-			level.playSound(null, hit.getBlockPos(), BlahajSoundEvents.BLOCK_CUDDLY_ITEM_HIT, SoundSource.BLOCKS, 0.5f, 1);
+		level.playSound(null, hit.getBlockPos(), BlahajSoundEvents.BLOCK_CUDDLY_ITEM_HIT, SoundSource.BLOCKS, 0.5f, 1);
 		super.onProjectileHit(level, state, hit, projectile);
 	}
-
 
 
 	@Override
